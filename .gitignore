@@ -1,0 +1,5 @@
+.terraform/*
+.lambda_src/*
+.terraform.tfstate
+.terraform.tfstate.backup
+.terraform.lock.hcl
