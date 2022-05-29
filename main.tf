@@ -20,7 +20,7 @@ variable "email_address" {
 }
 
 variable "notifier_frequency" {
-    type = string
+  type = string
 }
 
 data "archive_file" "lambda_zipper" {
@@ -137,8 +137,8 @@ EOF
 }
 
 resource "aws_iam_policy" "iam_policy_for_lambda" {
-  name        = "iam_policy_for_lambda"
-  path        = "/"
+  name = "iam_policy_for_lambda"
+  path = "/"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -161,28 +161,28 @@ resource "aws_iam_role_policy_attachment" "policy_attachment_to_role" {
 
 resource "aws_lambda_function" "lambda_function" {
 
-  filename = "${path.root}/.lambda_src/lambda_src.zip"
-  function_name = "stackoverflow-new-questions-notifier-lambda"
-  role          = aws_iam_role.iam_role_for_lambda.arn
-  handler       = "app.lambda_handler"
-  runtime       = "python3.8"
-  timeout       = 60
+  filename         = "${path.root}/.lambda_src/lambda_src.zip"
+  function_name    = "stackoverflow-new-questions-notifier-lambda"
+  role             = aws_iam_role.iam_role_for_lambda.arn
+  handler          = "app.lambda_handler"
+  runtime          = "python3.8"
+  timeout          = 60
   source_code_hash = filebase64sha256("${path.root}/.lambda_src/lambda_src.zip")
   layers = [
-      "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p38-requests:2",
-      "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p38-beautifulsoup4:1",
-      "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p38-lxml:1"
-    ]
+    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p38-requests:2",
+    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p38-beautifulsoup4:1",
+    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p38-lxml:1"
+  ]
 }
 
 resource "aws_cloudwatch_event_rule" "event_rule" {
-  name = "stackoverflow-new-questions-notifier-rule"
+  name                = "stackoverflow-new-questions-notifier-rule"
   schedule_expression = "rate(${var.notifier_frequency})"
 }
 
 resource "aws_cloudwatch_event_target" "event_target" {
-  rule      = aws_cloudwatch_event_rule.event_rule.name
-  arn       = aws_lambda_function.lambda_function.arn
+  rule = aws_cloudwatch_event_rule.event_rule.name
+  arn  = aws_lambda_function.lambda_function.arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
